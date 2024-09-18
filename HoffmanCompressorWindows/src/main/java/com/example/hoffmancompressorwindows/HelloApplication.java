@@ -27,6 +27,7 @@ public class HelloApplication extends Application {
     //private Stage primaryStage; // declare it as a class field
     private TextField filePathField; // declare it as a class field
     private Button compressButton;
+
     private static TreeMap<Character, Integer> countFrequency(String text) {
         TreeMap<Character, Integer> freqMap = new TreeMap<>();
         for (int i = 0; i < text.length(); i++) {
@@ -141,19 +142,19 @@ public class HelloApplication extends Application {
     private void fileCompress(String filePath) throws IOException {
         try {
             // загрузка содержимого файла в виде строки
-            String content = new String(Files.readAllBytes(Paths.get("C:/Users/fandi/Documents/AVL_tree_java/Huffman_compressor/src/text.txt")));
+            String content = new String(Files.readAllBytes(Paths.get("C:/Users/fandi/Documents/AVL_tree_java/AVL_TREE_HOFFMAN/src/ports.png")));
 
             // вычисление таблицы частот с которыми встречаются символы в тексте
             TreeMap<Character, Integer> frequencies = countFrequency(content);
 
-            ArrayList<CodeTreeNode> codeTreeNodes = new ArrayList<>();
+            //ArrayList<CodeTreeNode> codeTreeNodes = new ArrayList<>();
 
             // генерация листов будущего дерева для символов текста
             for (Character c : frequencies.keySet()) {
-                codeTreeNodes.add(new CodeTreeNode(c, frequencies.get(c)));
+                this.codeTreeNodes.add(new CodeTreeNode(c, frequencies.get(c)));
             }
             // построение кодового дерева алгоритмом Хаффмана
-            CodeTreeNode tree = huffman(codeTreeNodes);
+            CodeTreeNode tree = huffman(this.codeTreeNodes);
 
             // постоение таблицы префиксных кодов для символов исходного текста
             TreeMap<Character, String> codes = new TreeMap<>();
@@ -168,22 +169,22 @@ public class HelloApplication extends Application {
             }
 
             // сохранение сжатой информации в файл
-            File file = new File("C:/Users/fandi/Documents/AVL_tree_java/Huffman_compressor/src/compressed.huff");
+            File file = new File("C:/Users/fandi/Documents/AVL_tree_java/Huffman_compressor/src/ports.huff");
             saveToFile(file, frequencies, encoded.toString());
 
 
             TreeMap<Character, Integer> frequencies2 = new TreeMap<>();
             StringBuilder encoded2 = new StringBuilder();
-            codeTreeNodes.clear();
+            this.codeTreeNodes.clear();
 
             // извлечение сжатой информации из файла
             loadFromFile(file, frequencies2, encoded2);
 
             // генерация листов и постоение кодового дерева Хаффмана на основе таблицы частот сжатого файла
             for (Character c : frequencies2.keySet()) {
-                codeTreeNodes.add(new CodeTreeNode(c, frequencies2.get(c)));
+                this.codeTreeNodes.add(new CodeTreeNode(c, frequencies2.get(c)));
             }
-            CodeTreeNode tree2 = huffman(codeTreeNodes);
+            CodeTreeNode tree2 = huffman(this.codeTreeNodes);
 
             // декодирование обратно исходной информации из сжатой
             String decoded = huffmanDecode(encoded2.toString(), tree2);
@@ -193,7 +194,7 @@ public class HelloApplication extends Application {
             System.out.println("Размер исходной строки: " + decoded.getBytes().length * 8 + " бит");
             System.out.println("Размер сжатой строки: " + encoded.length() + " бит");
             System.out.println("Биты сжатой строки: " + encoded);
-            Files.write(Paths.get("C:/Users/fandi/Documents/AVL_tree_java/Huffman_compressor/src/decompressed.txt"), decoded.getBytes());
+            Files.write(Paths.get("C:/Users/fandi/Documents/AVL_tree_java/Huffman_compressor/src/ports_decompressed.png"), decoded.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
