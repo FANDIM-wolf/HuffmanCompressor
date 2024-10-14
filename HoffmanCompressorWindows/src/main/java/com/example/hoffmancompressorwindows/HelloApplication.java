@@ -114,15 +114,18 @@ public class HelloApplication extends Application {
         }
     }
 
-    private void fileUncompress(String filePath) throws  IOException {
-
+    private void fileUncompress(String filePath) throws IOException {
         File file = new File(filePath);
         TreeMap<Character, Integer> frequencies2 = new TreeMap<>();
         StringBuilder encoded2 = new StringBuilder();
         this.codeTreeNodes.clear();
 
+        System.out.println("Uncompressing file: " + filePath);
+
         // извлечение сжатой информации из файла
         loadFromFile(file, frequencies2, encoded2);
+
+        System.out.println("Encoded file content: " + encoded2);
 
         // генерация листов и постоение кодового дерева Хаффмана на основе таблицы частот сжатого файла
         for (Character c : frequencies2.keySet()) {
@@ -130,24 +133,29 @@ public class HelloApplication extends Application {
         }
         CodeTreeNode tree2 = huffman(this.codeTreeNodes);
 
+        System.out.println("Decoding file content...");
+
         // декодирование обратно исходной информации из сжатой
         String decoded = huffmanDecode(encoded2.toString(), tree2);
+
+        System.out.println("Decoded file content: " + decoded);
 
         // сохранение в файл декодированной информации
         // Remove the ".huff" extension from the file path
         String originalFilePath = filePath.replace(".huff", "");
         Files.write(Paths.get(originalFilePath), decoded.getBytes());
-        System.out.println(originalFilePath);
+
+        System.out.println("Uncompression successful! Original file saved to: " + originalFilePath);
     }
     private void fileCompress(String filePath) throws IOException {
+        this.codeTreeNodes.clear();
         try {
             // загрузка содержимого файла в виде строки
-            String content = new String(Files.readAllBytes(Paths.get("C:/Users/fandi/Documents/AVL_tree_java/AVL_TREE_HOFFMAN/src/ports.png")));
+            String content = new String(Files.readAllBytes(Paths.get(filePath)));
+            System.out.println("Original file content: " + content);
 
             // вычисление таблицы частот с которыми встречаются символы в тексте
             TreeMap<Character, Integer> frequencies = countFrequency(content);
-
-            //ArrayList<CodeTreeNode> codeTreeNodes = new ArrayList<>();
 
             // генерация листов будущего дерева для символов текста
             for (Character c : frequencies.keySet()) {
@@ -168,35 +176,16 @@ public class HelloApplication extends Application {
                 encoded.append(codes.get(content.charAt(i)));
             }
 
+            System.out.println("Encoded file content: " + encoded);
+
             // сохранение сжатой информации в файл
-            File file = new File("C:/Users/fandi/Documents/AVL_tree_java/Huffman_compressor/src/ports.huff");
+            File file = new File(filePath + ".huff");
             saveToFile(file, frequencies, encoded.toString());
-
-
-            TreeMap<Character, Integer> frequencies2 = new TreeMap<>();
-            StringBuilder encoded2 = new StringBuilder();
             this.codeTreeNodes.clear();
 
-            // извлечение сжатой информации из файла
-            loadFromFile(file, frequencies2, encoded2);
-
-            // генерация листов и постоение кодового дерева Хаффмана на основе таблицы частот сжатого файла
-            for (Character c : frequencies2.keySet()) {
-                this.codeTreeNodes.add(new CodeTreeNode(c, frequencies2.get(c)));
-            }
-            CodeTreeNode tree2 = huffman(this.codeTreeNodes);
-
-            // декодирование обратно исходной информации из сжатой
-            String decoded = huffmanDecode(encoded2.toString(), tree2);
-
-            // сохранение в файл декодированной информации
-
-            System.out.println("Размер исходной строки: " + decoded.getBytes().length * 8 + " бит");
-            System.out.println("Размер сжатой строки: " + encoded.length() + " бит");
-            System.out.println("Биты сжатой строки: " + encoded);
-            Files.write(Paths.get("C:/Users/fandi/Documents/AVL_tree_java/Huffman_compressor/src/ports_decompressed.png"), decoded.getBytes());
+            System.out.println("Compression successful!");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error compressing file: " + e.getMessage());
         }
     }
     @Override
@@ -250,6 +239,7 @@ public class HelloApplication extends Application {
 
         Scene scene = new Scene(root, 400, 200);
         primaryStage.setScene(scene);
+        primaryStage.setTitle("File Compressor");
         primaryStage.show();
     }
 
